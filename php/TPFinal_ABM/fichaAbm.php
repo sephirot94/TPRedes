@@ -5,9 +5,9 @@ $conn=mysqli_connect(HOST,DB_USERNAME,DB_PASSWORD,DB_NAME);
 if ($conn->connect_errno) {
     echo "Fall� la conexi�n a MySQL: (" . $conn->connect_errno . ") " . $conn->connect_error;
 }
-
+$id= $_GET['ID'];
 #Seleccion de alumnos:
-$sqlAlumnos="select * from alumnos where ID=$identificador";
+$sqlAlumnos="select * from alumnos where ID=$id";
 
 $resultadoAlumnos=mysqli_query($conn,$sqlAlumnos);
 
@@ -23,59 +23,15 @@ $resultadoAprobados=mysqli_query($conn,$sqlAprobados);
 <head>
 <title>Formulario para modificaciones</title>
 
-<script>
-/*Funciones*/
-
-function inicio() {
-	document.getElementById("ID").readOnly=true;
-	document.getElementById("DNI").disabled=true; 
-	document.getElementById('btModificar').disabled=true;
-	document.getElementById('btReset').disabled=false;
-}
-
-function todoListo() {
-	if(objApellido.checkValidity()&&objNombre.checkValidity()){
-	document.getElementById("btModificar").disabled=false;
-	document.getElementById("btReset").disabled=false;
-	}
-	else if((objApellido.value!="")||(objNombre.value!="")) {
-	document.getElementById("btModificar").disabled=true;
-	document.getElementById("btReset").disabled=false;
-	}
-	else {
-	document.getElementById("btModificar").disabled=true;
-	document.getElementById("btReset").disabled=true;
-	}
-}
-
-function blanquear() {
-	if(confirm("¿Esta seguro de blanquear?")) {
-		document.getElementById("apellido").value="";
-		document.getElementById("nombre").value="";
-		document.getElementById("DNI").focus();
-		document.getElementById("btModificar").disabled=true;
-		document.getElementById("btReset").disabled=true;
-	}
-}
-
-function modificacion() {
-if(confirm("¿Está seguro de modificar registro?")) {
-document.getElementById("fAbm").action='modificacion.php';
-document.getElementById("fAbm").submit();
-}
-}
-
-</script>
-
 </head>
 
-<body onLoad="inicio()">
+<body>
 
 <div class="ficha">
 
 <h1>Modificaciones de usuario</h1>
 
-<form id="fAbm" action="" method="get"> 
+<form id="fAbm" action="./modificacion.php" method="get"> 
 <table>
 <tr>
 <td>ID de Alumno: </td><td><input type="text" id="ID" name="ID" value="<?php echo $fila['ID']; ?>" required></input></td>
@@ -87,6 +43,10 @@ document.getElementById("fAbm").submit();
 
 <tr>
 <td>Apellido: </td><td><input type="text" id="apellido" name="apellido"  value="<?php echo $fila['apellido']; ?>" required></input></td>
+</tr>
+
+<tr>
+<td>DNI: </td><td><input type="text" id="DNI" name="DNI"  value="<?php echo $fila['DNI']; ?>" required></input></td>
 </tr>
 
 <tr>
@@ -111,67 +71,73 @@ echo "<option value='" . $filaAprobado['ID'] . "'>" . $filaAprobado['ID'] . "&nb
 </tr>
 
 <tr>
-<td>Fecha Nacimiento: </td><td><input type="date" name="fNac" id="fNac" value="<?php echo $fila['fNac']?>"></input></td>
+<td>Fecha Nacimiento: </td><td><input type="date" name="FechaNac" id="FechaNac" value="<?php echo $fila['FechaNac']?>"></input></td>
 </tr>
 
 
 </table>
 </form>
 
-<button id="btReset">Blanquear</button>
-<button id="btModificar">Modificar</button>
-<button id="btVolver">Volver</button>
+<button id="reset">Reset</button>
+<button id="alta">Modificar</button>
+<button onClick="location.href='./index.php'">Volver</button>
 </div>
-
+<script>
+		function enviar(arg) {
+			if(confirm("Desea modificar el alumno?")) {
+				arg.submit();				
+			}			
+		}
+		function resetear(arg) {
+			arg.reset();
+			document.getElementById("alta").disabled = true;
+			document.getElementById("reset").disabled = true;
+		}
+		function validar(objNombre,objApellido,objDNI, objFechaNac) {	
+			document.getElementById("reset").disabled = false;		
+			if(objApellido.checkValidity() && objNombre.checkValidity() && objDNI.checkValidity() && objFechaNac.checkValidity()) {
+				document.getElementById("alta").disabled = false;
+				document.getElementById("reset").disabled = false;
+			}
+			else{
+				document.getElementById("alta").disabled = true;				
+			}		
+		}        
+</script>
+<script>
+	var objformulario = document.getElementById("fAbm");
+	var objApellido = document.getElementById("apellido");
+	var objNombre = document.getElementById("nombre");
+    var objDNI = document.getElementById("DNI");
+    var objFechaNac = document.getElementById("FechaNac");
+    var objAprobado = document.getElementById("aprobado");
+	var objreset = document.getElementById("reset");
+	objreset.onclick = function() {resetear(objformulario);}
+	objApellido.onkeyup = function() { validar(objApellido,objNombre,objDNI,objFechaNac);}
+	objNombre.onkeyup = function() { validar(objApellido,objNombre,objDNI,objFechaNac);}
+	objDNI.onkeyup = function() { validar(objApellido,objNombre,objDNI,objFechaNac);}
+	objFechaNac.onkeyup = function() { validar(objApellido,objNombre,objDNI,objFechaNac);}	
+	document.getElementById("alta").onclick = function() {enviar(objformulario)};
+</script>
+</html>
 
 <script>
-
-/*Objetos*/
-var objId = document.getElementById("id");
-var objApellido = document.getElementById("apellido");
-var objLoginDeUsuario = document.getElementById("loginDeUsuario");
-var objnombre = document.getElementById("nombre");
-var objaprobado = document.getElementById("aprobado");
-var objClave = document.getElementById("clave");
-var objfNac = document.getElementById("fNac");
-
-/*Eventos*/
-
-objApellido.onkeyup = function() {
-todoListo();
+function cargarCategorias() {			
+			var objAjax = $.ajax({
+			type:"post", 
+			url: "../JsonCategorias.php",		
+			success: function(respuestaDelServer,estado) { 
+						var objCategorias = document.getElementById("categoria");
+						listaDeObjetos = JSON.parse(respuestaDelServer);				
+						listaDeObjetos.categorias.forEach(function(argValor,argIndice) { 
+							var objOption = document.createElement("option");
+							objOption.setAttribute("value", argValor.idCategoria);
+							objOption.innerHTML = argValor.Descripcion;
+							objCategorias.appendChild(objOption);							
+						});						
+				} 
+		}); 
 }
-
-objLoginDeUsuario.onkeyup = function() {
-todoListo();
-}
-
-objnombre.onkeyup = function() {
-todoListo();
-} 
-
-objaprobado.onchange = function() {
-todoListo();
-} 
-
-
-objfNac.onchange = function() {
-todoListo();
-} 
-
-document.getElementById("btReset").onclick = function() {
-blanquear();
-}
-
-
-document.getElementById("btModificar").onclick = function() {
-modificacion();
-}
-
-document.getElementById("btVolver").onclick = function() {
-history.back();
-}
-
 </script>
-
 </body>
 </html>
