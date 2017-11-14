@@ -1,5 +1,5 @@
 <?php
-// include("../TPFinal_Sesion/ingresoalsistema.php")
+include("../TPFinal_Sesion/ingresoalsistema.php")
 $respuestaAprobados = "../jsonAprobados.php";
 
 $respuestaAlumnos = "../jsonAlumnos.php";
