@@ -1,14 +1,16 @@
 <?php
 
-$log=$_POST['login'];
-$cl=$_POST['clave'];
-
-if (!autenticacion($log,$cl)) { 
+$log=$_GET['username'];
+$cl=$_GET['password'];
+var_dump($log);
+var_dump($cl);
+die;
+// if (!autenticacion($log,$cl)) { 
 	
-	header('Location: ./formularioDeLogin.html');
-	exit();
+// 	header('Location: ./formularioDeLogin.html');
+// 	die;
 
-}
+// }
 
 echo "<h1>Acceso permitido</h1>";
 
@@ -26,7 +28,7 @@ function autenticacion($arg1,$arg2) {
 
 	$loginDeUsuario = $arg1;
 	$clave = $arg2;
-	$claveEncriptada = sha1(trim($_POST['clave']));
+	$claveEncriptada = sha1(trim($_POST['password']));
 
 	include("../Constants.php");
 	$conn=mysqli_connect(HOST,DB_USERNAME,DB_PASSWORD,DB_NAME);
@@ -35,13 +37,13 @@ function autenticacion($arg1,$arg2) {
 		echo "Fall� la conexi�n a MySQL: (" . $conn->connect_errno . ") " . $conn->connect_error;
 	}	
 
-	$sql="select * from usuarios where loginDeUsuario='$loginDeUsuario';";
+	$sql="select * from usuarios where username='$loginDeUsuario';";
 	
 	$resultado=mysqli_query($conn,$sql);
 	$campos=mysqli_fetch_array($resultado);
 		
-	if (($campos['loginDeUsuario']==$loginDeUsuario)&&($campos['loginDeUsuario']<>"")) {
-		if ($campos['clave']==$claveEncriptada) {
+	if (($campos['username']==$loginDeUsuario)&&($campos['username']<>"")) {
+		if ($campos['password']==$claveEncriptada) {
 			$Aceptado=true;
 		}
 		else {
