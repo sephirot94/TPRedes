@@ -1,5 +1,9 @@
 <!-- Alta.php -->
 <?php
+session_start();
+if (!isset($_SESSION['idSession'])) {
+	header('Location: ./ingresoalsistema.php');
+}
 include("../Constants.php");
 $conn=mysqli_connect(HOST,DB_USERNAME,DB_PASSWORD,DB_NAME);
 

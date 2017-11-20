@@ -1,4 +1,8 @@
 <?php
+session_start();
+if (!isset($_SESSION['idSession'])) {
+	header('Location: ./ingresoalsistema.php');
+}
 include("Constants.php");
 if (isset($_POST['orden'])) { 
 	$orden=$_POST['orden'];

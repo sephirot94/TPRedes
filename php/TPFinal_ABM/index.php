@@ -1,7 +1,8 @@
 <?php
-// if (!isset($_SESSION['idSession'])) {
-// 	header('Location: ./ingresoalsistema.php');
-// }
+session_start();
+if (!isset($_SESSION['idSession'])) {
+	header('Location: ./ingresoalsistema.php');
+}
 $orden="ID";
 include("../Constants.php");
 $conn = new mysqli(HOST,DB_USERNAME,DB_PASSWORD,DB_NAME);
