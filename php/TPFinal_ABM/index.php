@@ -1,32 +1,29 @@
 <?php
-include("../TPFinal_Sesion/ingresoalsistema.php")
-$respuestaAprobados = "../jsonAprobados.php";
-
-$respuestaAlumnos = "../jsonAlumnos.php";
-// echo '<pre>';
-// var_dump($respuestaAlumnos);
-// echo '</pre>';
-// die;
-// orden default:
+// if (!isset($_SESSION['idSession'])) {
+// 	header('Location: ./ingresoalsistema.php');
+// }
 $orden="ID";
-
 include("../Constants.php");
-$conn=mysqli_connect(HOST,DB_USERNAME,DB_PASSWORD,DB_NAME);
+$conn = new mysqli(HOST,DB_USERNAME,DB_PASSWORD,DB_NAME);
 
 if ($conn->connect_errno) {
     echo "Fall� la conexi�n a MySQL: (" . $conn->connect_errno . ") " . $conn->connect_error;
 }
 
 
-$sqlAlumnos = "select * from alumnos where Nombre like '%" . $filtroNombre . "%' and Apellido like '%" . $filtroApellido . "%' and DNI like '%" . $filtroDNI . "%' order by " . $orden;
+$sqlAlumnos = "select * from alumnos";
 
 $sqlAprobados = "select * from aprobados";
 
-$resultadoAlumnos = $conn->query($sqlAlumnos);
+$resultadoAlumnos = $conn->query($sqlAlumnos)->fetch_assoc();
+// $resultadoAlumnos = $queryAlumnos->result();
+// var_dump($resultadoAlumnos);
 
-$resultadoAprobados = $conn->query($sqlAprobados);
+$resultadoAprobados = $conn->query($sqlAprobados)->fetch_assoc();
+// var_dump($resultadoAprobados);
 
-$cantidadAlumnos = $resultadoAlumnos->num_rows; 
+// $cantidadAlumnos = $resultadoAlumnos->num_rows; 
+$cantidadAlumnos = $conn->query($sqlAlumnos)->num_rows;
 
 ?>
 
@@ -86,10 +83,17 @@ cursor:pointer;
 
 col {
 width:12%;
+
 }
 
+#f_aprobados {
+	width: 90px;
+}
 </style>
-
+<script
+  src="https://code.jquery.com/jquery-3.2.1.js"
+  integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+  crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -98,7 +102,7 @@ width:12%;
 </header>
 
 <div class="parte">
-Orden: <input type="text" name="orden" id="orden" value="<?php echo $orden?>">
+Orden: <input readonly type="text" name="orden" id="orden" value="<?php echo $orden?>">
 </div>
 <div class="parte">
 <button id="cmdFiltrar">
@@ -108,6 +112,9 @@ Aplicar filtro
 <div class="parte">
 <button id="cmdLimpiaFiltros">
 Limpiar filtros
+</button>
+<button onClick="location.href='./fichaAlta.php'">
+ALTA
 </button>
 </div>
 <div class="limpiaFloats"></div>
@@ -125,10 +132,10 @@ Limpiar filtros
 <col id="aprobado" >
 </colgroup>  
 
-<th id="thId">ID de Alumno</th><th id="thNombre">Nombre</th><th id="thApellido">Apellido</th><th id="thDNI">DNI</th><th id="thFechaNac">Fecha de Nacimiento</th><th id="thAprobado">Aprobado</th><th id="thEdicion" style="width:50px">Modificacion</th><th id="thBajas" style="width:50px">Baja</th>
+<th id="thId">ID de Alumno</th><th id="thNombre">Nombre</th><th id="thApellido">Apellido</th><th id="thDNI">DNI</th><th id="thFechaNac">Fecha de Nacimiento</th><th id="thAprobado">Aprobado</th><th id="thEdicion" style="width:90px">Modificacion</th><th id="thBajas" style="width:50px">Baja</th>
 
 <tr>
-<td></td><td><input type="text" id="f_nombre" name="f_nombre"</td><td><input type="text" id="f_apellido" name="f_apellido"></input></td><td><input type="text" id="f_DNI" name="f_DNI"></input></td><td><select id="f_FechaNac" name="f_FechaNac"><option></option></select></td>
+<td></td><td><input type="text" id="f_nombre" name="f_nombre"</td><td><input type="text" id="f_apellido" name="f_apellido"></input></td><td><input type="text" id="f_DNI" name="f_DNI"></input></td><td><input type="text" id="f_FechaNac" name="f_FechaNac"></td><td><select id="f_aprobados" name="f_aprobados"><option></option></select></td><td></td><td></td>
 </tr>
 
 
@@ -150,15 +157,15 @@ function llenaAprobados() {
 			
 			var objAjax = $.ajax({
 			type:"get", 
-			url: "../jsonAprobados.php",
+			url: "../JsonAprobados.php",
 			success: function(respuestaDelServer,estado) {  
-						// var objF_apellido = document.getElementById("f_Apellido");
+						var objFiltroAprobados = document.getElementById("f_aprobados");
 						listaDeObjetos = JSON.parse(respuestaDelServer);
 						listaDeObjetos.aprobados.forEach(function(argValor,argIndice) { 
 							var objOption= document.createElement("option");
 							objOption.setAttribute("value", argValor.ID);
-							objOption.innerHTML=argValor.ID + argValor.Aprobado;
-							
+							objOption.innerHTML= argValor.aprobado;
+							objFiltroAprobados.appendChild(objOption);
 						});
 						
 			} 
@@ -169,15 +176,17 @@ function limpiarFiltros() {
 	document.getElementById("f_apellido").value="";
 	document.getElementById("f_nombre").value="";
 	document.getElementById("f_DNI").value="";
+	document.getElementById("f_FechaNac").value="";
+	document.getElementById("f_aprobados").value="";
 }
 
 function pueblaTabla() {
 	$("#tbDatos").empty();
 
 	var objAjax = $.ajax({
-			type:"get", 
-			url: "../jsonAlumnos.php",
-			data: { fapellido: $("#f_apellido").val(), fnombre:$("#f_nombre").val(), fDNI: $("#f_DNI").val(), orden: $("#orden").val() },
+			type:"post", 
+			url: "../JsonAlumnos.php",
+			data: { fapellido: $("#f_apellido").val(), fnombre:$("#f_nombre").val(), fDNI: $("#f_DNI").val(), fFechaNac: $("#f_FechaNac").val(), fAprobados: $("#f_aprobados").val() ,orden: $("#orden").val() },
 			success: function(respuestaDelServer,estado) { 
 						$("#tbDatos").empty();
 						listaDeObjetos = JSON.parse(respuestaDelServer);
@@ -192,11 +201,11 @@ function pueblaTabla() {
 							objTr.appendChild(objTd);
 							objTbDatos.appendChild(objTr);
 							var objTd=document.createElement("td");
-							objTd.innerHTML=argValor.Nombre;
+							objTd.innerHTML=argValor.nombre;
 							objTr.appendChild(objTd);
 							objTbDatos.appendChild(objTr);
 							var objTd=document.createElement("td");
-							objTd.innerHTML=argValor.Apellido;
+							objTd.innerHTML=argValor.apellido;
 							objTr.appendChild(objTd);
 							objTbDatos.appendChild(objTr);
 							var objTd=document.createElement("td");
@@ -208,7 +217,7 @@ function pueblaTabla() {
 							objTr.appendChild(objTd);
 							objTbDatos.appendChild(objTr);
 							var objTd=document.createElement("td");
-							objTd.innerHTML=argValor.Aprobado;
+							objTd.innerHTML=argValor.aprobado;
 							objTr.appendChild(objTd);
 
 							/*Nuevo para abm*/
@@ -264,11 +273,23 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-window.onload = function() {
+	$("#thFechaNac" ).click(function() {
+		$("#orden").val("FechaNac");
+		pueblaTabla();
+	});	
+});
+
+$(document).ready(function() {
+	$("#thAprobado" ).click(function() {
+		$("#orden").val("aprobado");
+		pueblaTabla();
+	});	
+});
+
+$(document).ready(function() {
 $("#orden").val("ID");
 llenaAprobados();
 pueblaTabla();
-}
 });
 
 //Filtrar

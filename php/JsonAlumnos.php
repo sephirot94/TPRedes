@@ -13,13 +13,16 @@ if($mysqli->connect_errno) {
     echo "error";
 }
 
-if (isset($_POST['filtroApellido']) || isset($_POST['filtroDNI']) || isset($_POST['filtroNombre']))
-    $sql="select * from alumnos where apellido like '%" . $_POST['filtroApellido'] . "%' and DNI like '%" . $_POST['filtroDNI'] . "%' and nombre like '%" . $_POST['filtroNombre'] . "%' order by " . $orden;
-else
+if (isset($_POST['fapellido']) || isset($_POST['fDNI']) || isset($_POST['fnombre']) || isset($_POST['fFechaNac']) || isset($_POST['fAprobados'])) {
+    $sql="select * from alumnos where apellido like '%" . $_POST['fapellido'] . "%' and DNI like '%" . $_POST['fDNI'] . "%' and nombre like '%" . $_POST['fnombre'] . "%' and FechaNac like '%" . $_POST['fFechaNac'] . "%' and aprobado like '%" . $_POST['fAprobados'] . "%' order by " . $orden;
+}
+else {
     $sql = "select * from alumnos order by " . $orden;
+}
 
 $resultado = $mysqli->query($sql); 
-$cantidadArticulos = $resultado->num_rows;
+
+// $cantidadArticulos = $resultado->num_rows;
 
 $miArray = array();
 if($resultado){

@@ -1,28 +1,29 @@
 <?php
+if (!empty($_POST)) {
+	$log=$_POST['username'];
+	$cl=$_POST['password'];
+}
 
-$log=$_GET['username'];
-$cl=$_GET['password'];
-var_dump($log);
-var_dump($cl);
-die;
-// if (!autenticacion($log,$cl)) { 
+if (!autenticacion($log,$cl)) { 
 	
-// 	header('Location: ./formularioDeLogin.html');
-// 	die;
+	header('Location: ./formularioDeLogin.html');
+	exit;
 
-// }
-
-echo "<h1>Acceso permitido</h1>";
+}
 
 session_start();
+
+echo "<h1>Acceso permitido</h1>";
 
 $_SESSION['idSession'] = session_id();	
 
 $_SESSION['login']=$log;
+// var_dump($_SESSION);
+// die;
 echo "<h2>Sus parametros de sesion son los siguientes: </h2>";
 infoDeSesion();
 
-echo "<p><button onClick=\"location.href='./index.php'\">Ingrese a la aplicación</button><p>";
+echo "<p><button onClick=\"location.href='./index.php'\">Ingrese a la aplicacion</button><p>";
 
 function autenticacion($arg1,$arg2) {
 
@@ -59,8 +60,8 @@ return $Aceptado;
 function infoDeSesion() {
 
 	echo "<div style='border-style:solid;border-width:thin;padding:10px'>";	
-	echo "<h1>Información de Sesión</h1>";
-	echo "<h2> Identificativo de sesión: " . $_SESSION['idSession'] . "</h2>";
+	echo "<h1>Informacion de Sesion</h1>";
+	echo "<h2> Identificativo de sesion: " . $_SESSION['idSession'] . "</h2>";
 	echo "<h2> Login de usuario: " . $_SESSION['login'] . "</h2>";
 	echo "</div>";
 }

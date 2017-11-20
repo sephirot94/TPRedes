@@ -1,7 +1,7 @@
 <!--baja.php-->
 <?php
 include("../Constants.php");
-$conn=conn_connect(HOST,DB_USERNAME,DB_PASSWORD,DB_NAME);
+$conn=mysqli_connect(HOST,DB_USERNAME,DB_PASSWORD,DB_NAME);
 
 $id = $_GET['ID'];
 ?>
@@ -15,11 +15,11 @@ $id = $_GET['ID'];
 <div class="contenedor">
 <?php
 
-		$sql = "delete from usuarios where ID='$id';";
+		$sql = "delete from alumnos where ID='$id';";
 
 		echo "<br>" . $sql;
 		$result = mysqli_query($conn,$sql);
-
+		
 		if ($result==1) {
 		echo "<h5>Baja realizada correctamente</h5>";
 		}
