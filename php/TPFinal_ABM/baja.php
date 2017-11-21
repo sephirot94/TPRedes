@@ -6,8 +6,13 @@ if (!isset($_SESSION['idSession'])) {
 }
 include("../Constants.php");
 $conn=mysqli_connect(HOST,DB_USERNAME,DB_PASSWORD,DB_NAME);
-
-$id = $_GET['ID'];
+$id = "";
+if (isset($_POST['ID'])) {
+	$id = $_POST['ID'];
+}
+if (isset($_GET['ID'])) {
+	$id = $_GET['ID'];
+}
 ?>
 <html>
 <head>

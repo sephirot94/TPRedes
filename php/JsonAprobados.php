@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['idSession'])) {
-	header('Location: ./ingresoalsistema.php');
+	header('Location: ./TPFinal_ABM/ingresoalsistema.php');
 }
 include("Constants.php");
 $conn=mysqli_connect(HOST,DB_USERNAME,DB_PASSWORD,DB_NAME);

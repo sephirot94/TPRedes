@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['idSession'])) {
-	header('Location: ./ingresoalsistema.php');
+	header('Location: ./TPFinal_ABM/ingresoalsistema.php');
 }
 include("Constants.php");
 if (isset($_POST['orden'])) { 
