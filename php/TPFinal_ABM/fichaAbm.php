@@ -62,10 +62,10 @@ Aprobado:
 <?php
 while($filaAprobado=mysqli_fetch_assoc($resultadoAprobados)) {
 if ($filaAprobado['ID']==$fila['aprobado']) {
-echo "<option value='" . $filaAprobado['ID'] . "' selected='selected'>" . $filaAprobado['ID'] . "&nbsp;" . $filaAprobado['aprobado'] . "</option>";
+echo "<option value='" . $filaAprobado['ID'] . "' selected='selected'>"  . $filaAprobado['aprobado'] . "</option>";
 }
 else {
-echo "<option value='" . $filaAprobado['ID'] . "'>" . $filaAprobado['ID'] . "&nbsp;" . $filaAprobado['aprobado'] . " </option>";
+echo "<option value='" . $filaAprobado['ID'] . "'>"  . $filaAprobado['aprobado'] . " </option>";
 }
 }
 ?>
